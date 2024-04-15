@@ -12,7 +12,7 @@ const convertToXML = () => {
     const formData = new FormData();
     formData.append('file', file);
 
-    fetch('http://localhost:3001/', {
+    fetch('https://service-grader.onrender.com/', {
         method: 'POST',
         body: formData,
     })
