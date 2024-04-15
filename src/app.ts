@@ -44,6 +44,9 @@ app.post("/", upload.single("file"), async (req: Request, res: Response) => {
     return res.status(400).send("No file uploaded.");
   }
   const filePath = req.file.path; // Path to the stored file
+  console.log("req.file:", req.file)
+  console.log("req.file:", req.file.originalname)
+
   console.log("filePath:", filePath)
   try {
     const data = await fs.readFile(filePath, "utf8");
