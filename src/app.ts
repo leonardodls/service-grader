@@ -31,14 +31,13 @@ async function createUploadsDirectory() {
 }
 
 createUploadsDirectory();
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => {
-    console.log("file1:", file)
-    console.log("file name:", file.originalname)
+    console.log("file1:", file);
+    console.log("file name:", file.originalname);
   
-    cb(null, `${file.originalname}`),
+    cb(null, `${file.originalname}`);
   }
 });
 
