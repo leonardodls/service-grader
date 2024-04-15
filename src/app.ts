@@ -4,6 +4,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs/promises";
+import path from 'path';
+
 
 dotenv.config();
 
@@ -15,6 +17,20 @@ const port: number = parseInt(process.env.PORT || "3001");
 app.get("/", (req: Request, res: Response) => {
   res.send("Grader service is running.");
 });
+
+
+const uploadsDir = path.join(__dirname, 'uploads');
+
+async function createUploadsDirectory() {
+    try {
+        await fs.mkdir(uploadsDir, { recursive: true });
+        console.log('Uploads directory created');
+    } catch (err) {
+        console.error('Failed to create directory:', err);
+    }
+}
+
+createUploadsDirectory();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
