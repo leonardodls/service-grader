@@ -34,7 +34,12 @@ createUploadsDirectory();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => cb(null, `${file.originalname}`),
+  filename: (req, file, cb) => {
+    console.log("file1:", file)
+    console.log("file name:", file.originalname)
+  
+    cb(null, `${file.originalname}`),
+  }
 });
 
 const upload = multer({ storage });
@@ -44,8 +49,6 @@ app.post("/", upload.single("file"), async (req: Request, res: Response) => {
     return res.status(400).send("No file uploaded.");
   }
   const filePath = req.file.path; // Path to the stored file
-  console.log("req.file:", req.file)
-  console.log("req.file:", req.file.originalname)
 
   console.log("filePath:", filePath)
   try {
