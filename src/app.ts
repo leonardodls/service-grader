@@ -1,13 +1,50 @@
-import express, { Application, Request, Response } from 'express'
+import express, { Application, Request, Response } from "express";
 
-const app: Application = express()
+import cors from "cors";
+import dotenv from "dotenv";
+import multer from "multer";
+import fs from "fs/promises";
 
-const port: number = 3001
+dotenv.config();
 
-app.get('/toto', (req: Request, res: Response) => {
-    res.send('Hello toto')
-})
+const app: Application = express();
+app.use(cors());
+
+const port: number = parseInt(process.env.PORT || "3001");
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Grader service is running.");
+});
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) => cb(null, `${file.originalname}`),
+});
+
+const upload = multer({ storage });
+
+app.post("/", upload.single("file"), async (req: Request, res: Response) => {
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+  const filePath = req.file.path; // Path to the stored file
+  try {
+    const data = await fs.readFile(filePath, "utf8");
+    res.setHeader("Content-Type", "text/xml");
+    res.send(data);
+  } catch (error) {
+    console.error("Error reading the file:", error);
+    res.status(500).send("Failed to process the file");
+  } finally {
+    // Always clean up the uploaded file
+    try {
+      await fs.unlink(filePath);
+    } catch (cleanupError) {
+      console.error("Failed to clean up the file:", cleanupError);
+    }
+  }
+});
 
 app.listen(port, function () {
-    console.log(`App is listening on port ${port} !`)
-})
+  console.log(`App is listening on port ${port} !`);
+});
