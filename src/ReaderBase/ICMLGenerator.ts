@@ -3,7 +3,7 @@ import { ITranslator } from "./ITranslator";
 export interface ICMLGenerator {
   generateCML: (
     objTranslator: ITranslator,
-    filePath: string,
+    FilePath: string,
     strDocumentName: string
   ) => Promise<XMLDocument>;
 }

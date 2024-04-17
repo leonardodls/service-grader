@@ -3,7 +3,7 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
-// import fs from "fs/promises";
+import fs from "fs/promises";
 import { Word2013CMLGenerator } from "./WordReader2013/Word2013CMLGenerator";
 import { Word2013Translator } from "./WordReader2013/Word2013Translator";
 import xmldom from "xmldom";
@@ -30,15 +30,16 @@ app.post("/", upload.single("file"), async (req: Request, res: Response) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
+  const FilePath = req.file.path; // Path to the stored file
+
   try {
-    const filePath = req.file.path; // Path to the stored file
     const cmlTranslator = new Word2013Translator();
     const cmlGenerator = new Word2013CMLGenerator();
     const docName = req.file.filename;
 
     const data = await cmlGenerator.generateCML(
       cmlTranslator,
-      filePath,
+      FilePath,
       docName
     );
     // Create an XML Serializer to convert the document to a string
@@ -53,11 +54,11 @@ app.post("/", upload.single("file"), async (req: Request, res: Response) => {
     res.status(500).send(error || "Failed to process the file");
   } finally {
     // Always clean up the uploaded file
-    // try {
-    //   await fs.unlink(filePath);
-    // } catch (cleanupError) {
-    //   console.error("Failed to clean up the file:", cleanupError);
-    // }
+    try {
+      await fs.unlink(FilePath);
+    } catch (cleanupError) {
+      console.error("Failed to clean up the file:", cleanupError);
+    }
   }
 });
 

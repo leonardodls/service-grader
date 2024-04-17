@@ -1,9 +1,6 @@
-import { PackageReader } from "./PackageReader";
-
 export interface IPartFileParser {
-  retrunParsedElement: (
+  RetrunParsedElement: (
     partFileStream: Buffer,
-    cmlDocumentXMLNode: XMLDocument,
-    currentPackageReader: PackageReader
-  ) => XMLDocument;
+    CMLDocumentXMLNode: XMLDocument
+  ) => XMLDocument | HTMLElement;
 }

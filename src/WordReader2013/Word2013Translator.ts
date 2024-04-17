@@ -6,14 +6,14 @@ import { DocPropertiesParser } from "./ElementParser/DocPropertiesParser";
 import { Office12WordTranslator } from "../WordReader/Office12WordTranslator";
 
 export class Word2013Translator extends Office12WordTranslator {
-  parseDocument = async (
-    filePath: string,
-    cmlDocumentXMLNode: XMLDocument,
+  ParseDocument = async (
+    FilePath: string,
+    CMLDocumentXMLNode: XMLDocument,
     strDocumentName: string
   ): Promise<boolean> => {
     this.m_DocumentName = strDocumentName;
-    // Utils utils = new Utils();
-    const docReader = await fs.readFile(filePath, null);
+
+    const docReader = await fs.readFile(FilePath, null);
 
     let strEtension: string = "";
     if (this.m_DocumentName != "" && this.m_DocumentName.length > 4) {
@@ -26,7 +26,7 @@ export class Word2013Translator extends Office12WordTranslator {
       throw new Error("The package does not contain the basic document.xml");
     }
 
-    this.m_xmlGeneDoc = cmlDocumentXMLNode;
+    this.m_xmlGeneDoc = CMLDocumentXMLNode;
     this.m_myPackageReader = new PackageReader();
 
     const checkForIncompatibleOfficePlatform: boolean = true;
@@ -58,10 +58,9 @@ export class Word2013Translator extends Office12WordTranslator {
     );
     const docProps: IPartFileParser = new DocPropertiesParser();
 
-    const eleDocProps: XMLDocument = docProps.retrunParsedElement(
+    const eleDocProps: XMLDocument | HTMLElement = docProps.RetrunParsedElement(
       ss as Buffer,
-      this.m_xmlGeneDoc as XMLDocument,
-      this.m_myPackageReader
+      this.m_xmlGeneDoc as XMLDocument
     );
 
     const xReturn = this.ReturnCoreProperties(eleDocProps);

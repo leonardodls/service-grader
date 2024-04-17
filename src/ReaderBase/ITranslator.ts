@@ -1,7 +1,7 @@
 export interface ITranslator {
-  parseDocument: (
-    filePath: string,
-    cmlDocumentXMLNode: XMLDocument,
+  ParseDocument: (
+    FilePath: string,
+    CMLDocumentXMLNode: XMLDocument,
     strDocumentName: string
   ) => Promise<boolean>;
 }

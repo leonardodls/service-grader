@@ -10,14 +10,14 @@ export class Office12WordTranslator implements IWordTranslator {
   protected m_DocumentName: string = "";
   protected m_xmlGeneDoc: XMLDocument | null = null;
 
-  parseDocument = async (
-    filePath: string,
-    cmlDocumentXMLNode: XMLDocument,
+  ParseDocument = async (
+    FilePath: string,
+    CMLDocumentXMLNode: XMLDocument,
     strDocumentName: string
   ) => {
     this.m_DocumentName = strDocumentName;
     // Utils utils = new Utils();
-    const docReader = await fs.readFile(filePath, null);
+    const docReader = await fs.readFile(FilePath, null);
 
     let strEtension: string = "";
     if (this.m_DocumentName != "" && this.m_DocumentName.length > 4) {
@@ -31,7 +31,7 @@ export class Office12WordTranslator implements IWordTranslator {
       throw new Error("The package does not contain the basic document.xml");
     }
 
-    this.m_xmlGeneDoc = cmlDocumentXMLNode;
+    this.m_xmlGeneDoc = CMLDocumentXMLNode;
     this.m_myPackageReader = new PackageReader();
 
     const checkForIncompatibleOfficePlatform: boolean = true;
@@ -61,10 +61,9 @@ export class Office12WordTranslator implements IWordTranslator {
       String(uri)
     );
     const docProps: IPartFileParser = new DocPropertiesParser();
-    const eleDocProps: XMLDocument = docProps.retrunParsedElement(
+    const eleDocProps: XMLDocument | HTMLElement = docProps.RetrunParsedElement(
       ss as Buffer,
-      this.m_xmlGeneDoc as XMLDocument,
-      this.m_myPackageReader
+      this.m_xmlGeneDoc as XMLDocument
     );
 
     const xReturn = this.ReturnCoreProperties(eleDocProps);
@@ -72,7 +71,9 @@ export class Office12WordTranslator implements IWordTranslator {
     return xReturn;
   };
 
-  ReturnCoreProperties = (eleDocProps: XMLDocument): XMLDocument => {
+  ReturnCoreProperties = (
+    eleDocProps: XMLDocument | HTMLElement
+  ): XMLDocument | HTMLElement => {
     if (!this.m_myPackageReader) {
       throw new Error("Package is not initailized yet..");
     }

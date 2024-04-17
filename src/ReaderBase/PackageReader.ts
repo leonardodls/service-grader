@@ -117,9 +117,13 @@ export class PackageReader {
     if (!file) return null;
 
     const contentBuffer = await file.async("nodebuffer");
-    return lenLimit === 0 || contentBuffer.length <= lenLimit
-      ? contentBuffer
-      : null;
+    if (lenLimit === 0 || contentBuffer.length <= lenLimit) {
+      return contentBuffer;
+    } else {
+      throw new Error(
+        "Failed to parse the submitted document size greator than requested size. Check the document."
+      );
+    }
   };
 
   ReturnPackageProperties = () => {

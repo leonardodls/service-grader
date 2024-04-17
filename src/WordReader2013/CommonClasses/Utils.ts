@@ -1,7 +1,7 @@
 export class Utils {
   static createNode = (
     xmlDoc: XMLDocument,
-    xmlParent: XMLDocument,
+    xmlParent: Element,
     tagName: string,
     tagValue: string
   ): Element => {

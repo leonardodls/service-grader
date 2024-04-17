@@ -12,7 +12,7 @@ interface XmlDeclaration {
 export class Word2013CMLGenerator implements ICMLGenerator {
   generateCML = async (
     objTranslator: ITranslator,
-    filePath: string,
+    FilePath: string,
     strDocumentName: string
   ) => {
     let cmlDocument: XMLDocument =
@@ -20,8 +20,8 @@ export class Word2013CMLGenerator implements ICMLGenerator {
     const objWordTranslator = objTranslator as IWordTranslator;
     let xmlWordDoc: HTMLElement;
 
-    const parsed = await objWordTranslator.parseDocument(
-      filePath,
+    const parsed = await objWordTranslator.ParseDocument(
+      FilePath,
       cmlDocument,
       strDocumentName
     );
