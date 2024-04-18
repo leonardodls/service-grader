@@ -1,5 +1,5 @@
 export class CommonFunctions {
-  static prependStringToURIPath = (
+  static PrependStringToURIPath = (
     uripath: string,
     stringToPrepend: string
   ): string => {

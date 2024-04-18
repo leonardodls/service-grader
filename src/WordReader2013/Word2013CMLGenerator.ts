@@ -2,6 +2,7 @@ import { ICMLGenerator } from "../ReaderBase/ICMLGenerator";
 import { ITranslator } from "../ReaderBase/ITranslator";
 import * as xmldom from "xmldom";
 import { IWordTranslator } from "../ReaderBase/IWordTranslator";
+import { Utils } from "./CommonClasses/Utils";
 
 interface XmlDeclaration {
   version: string;
@@ -15,28 +16,29 @@ export class Word2013CMLGenerator implements ICMLGenerator {
     FilePath: string,
     strDocumentName: string
   ) => {
-    let cmlDocument: XMLDocument =
-      new xmldom.DOMImplementation().createDocument(null, null, null);
+    let CMLDocument: XMLDocument =
+      new xmldom.DOMImplementation().createDocument(null, null, null); // XmlDocument CMLDocument = new XmlDocument();
     const objWordTranslator = objTranslator as IWordTranslator;
-    let xmlWordDoc: HTMLElement;
+    let xmlWordDoc: Element;
+    let xmlBody: Element;
 
     const parsed = await objWordTranslator.ParseDocument(
       FilePath,
-      cmlDocument,
+      CMLDocument,
       strDocumentName
     );
     if (parsed) {
       const xmldecl: ProcessingInstruction =
-        cmlDocument.createProcessingInstruction(
+        CMLDocument.createProcessingInstruction(
           "xml",
           'version="1.0" encoding="UTF-8"'
         );
-      cmlDocument.appendChild(xmldecl);
+      CMLDocument.appendChild(xmldecl);
 
       // Create the root element 'cmlwddoc'
-      xmlWordDoc = cmlDocument.createElement("cmlwddoc");
-      xmlWordDoc.appendChild(cmlDocument.createTextNode(""));
-      cmlDocument.appendChild(xmlWordDoc);
+      xmlWordDoc = CMLDocument.createElement("cmlwddoc");
+      xmlWordDoc.appendChild(CMLDocument.createTextNode(""));
+      CMLDocument.appendChild(xmlWordDoc);
 
       const xmlTemp = await objWordTranslator.ReturnWordDocumentProperties();
 
@@ -44,7 +46,18 @@ export class Word2013CMLGenerator implements ICMLGenerator {
         xmlWordDoc.appendChild(xmlTemp);
       }
 
-      return cmlDocument;
+      xmlBody = Utils.CreateNode(CMLDocument, xmlWordDoc, "body", "");
+      Utils.CreateNode(CMLDocument, xmlBody, "props", "");
+      const nBodyChiildCount: number = objWordTranslator.ReturnBodyChildCount();
+
+      for (let i = 0; i < nBodyChiildCount; i++) {
+        const xmlTemp = await objWordTranslator.ReturnBodyChild(i);
+        if (xmlTemp != null) {
+          xmlBody.appendChild(xmlTemp);
+        }
+      }
+
+      return CMLDocument;
     } else {
       throw new Error("Document was not parsed correctly");
     }

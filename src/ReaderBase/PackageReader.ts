@@ -10,6 +10,11 @@ interface relationship {
 
 export class PackageReader {
   private package: JSZip | null = null;
+  public partFileMap: Map<string, XMLDocument>; //need to check type definition.
+
+  constructor() {
+    this.partFileMap = new Map();
+  }
 
   initalisePackage = async (
     strFileName: Buffer,
@@ -34,56 +39,7 @@ export class PackageReader {
     }
   };
 
-  private getRelationships = async (
-    partUri = null
-  ): Promise<Array<relationship>> => {
-    if (!this.package) {
-      throw new Error("Package is not initailized yet..");
-    }
-    const parser = new xmldom.DOMParser();
-    let relationships = [];
-
-    // Determine the path to the relationships file
-    const relsPath = partUri ? `${partUri}/_rels/.rels` : "_rels/.rels";
-
-    const relsFile = this.package.file(relsPath);
-    if (!relsFile) {
-      console.log("No relationships file found at the specified path.");
-      return []; // Return an empty array if no relationships file is found
-    }
-
-    // Read and parse the relationships XML
-    const xmlData = await relsFile.async("string");
-    const doc = parser.parseFromString(xmlData, "application/xml");
-    const relationshipElements = doc.getElementsByTagName("Relationship");
-
-    for (let i = 0; i < relationshipElements.length; i++) {
-      const rel = relationshipElements[i];
-      relationships.push({
-        id: rel.getAttribute("Id"),
-        type: rel.getAttribute("Type"),
-        target: rel.getAttribute("Target"),
-        targetMode: rel.getAttribute("TargetMode"),
-      });
-    }
-
-    return relationships;
-  };
-
-  private findTargetURI(
-    relationships: relationship[] | null,
-    schemaName: string
-  ): string {
-    if (!relationships?.length) return "";
-    for (let i = 0; i < relationships.length; i++) {
-      if (relationships[i].type === schemaName) {
-        return relationships[i].target || "";
-      }
-    }
-    return "";
-  }
-
-  ReturnBaseXML = async (uri: URL | null, schemaName: string) => {
+  ReturnBaseXML = async (uri: string | null, schemaName: string) => {
     if (!this.package) {
       throw new Error("Package is not initailized yet..");
     }
@@ -93,13 +49,11 @@ export class PackageReader {
     if (!uri) {
       relColl = await this.getRelationships();
     } else {
-      // TO-DO - implemntation pending.
-      // PackagePart part = package.GetPart(uri);
-      // if (part == null)
-      // {
-      //     throw (new CPEException(CPEErrors.INVALID_INPUT, "Part is not present in the package"));
-      // }
-      // relColl = part.GetRelationships();
+      const part = this.package.file(uri.replace(/^\//, "")); // PackagePart part = package.GetPart(uri);
+      if (part == null) {
+        throw new Error("Part is not present in the package");
+      }
+      relColl = await this.getRelationships("word", "document.xml");
     }
 
     return this.findTargetURI(relColl, schemaName);
@@ -131,5 +85,88 @@ export class PackageReader {
       throw new Error("Package is not initailized yet..");
     }
     return this.package;
+  };
+
+  ReturnDocmentFromPart = async (
+    sFilePartName: string,
+    lenlimit: number = 0
+  ) => {
+    if (!this.package) {
+      throw new Error("Package is not initailized yet..");
+    }
+
+    if (sFilePartName == "") {
+      throw new Error("Part file name is not specified");
+    }
+
+    const sFileStream: Buffer | null = await this.ReturnPackagePart(
+      sFilePartName,
+      lenlimit
+    );
+
+    let doc: XMLDocument = new xmldom.DOMImplementation().createDocument(
+      null,
+      null,
+      null
+    );
+
+    if (sFileStream) {
+      const parser = new xmldom.DOMParser();
+      doc = parser.parseFromString(sFileStream.toString(), "text/xml");
+    }
+
+    return doc;
+  };
+
+  private findTargetURI(
+    relationships: relationship[] | null,
+    schemaName: string
+  ): string {
+    if (!relationships?.length) return "";
+    for (let i = 0; i < relationships.length; i++) {
+      if (relationships[i].type === schemaName) {
+        return relationships[i].target || "";
+      }
+    }
+    return "";
+  }
+
+  private getRelationships = async (
+    partUriFolder: string | null = null,
+    partUriXML: string | null = null
+  ): Promise<Array<relationship>> => {
+    if (!this.package) {
+      throw new Error("Package is not initailized yet..");
+    }
+    const parser = new xmldom.DOMParser();
+    let relationships = [];
+
+    // Determine the path to the relationships file
+    const relsPath = partUriFolder
+      ? `${partUriFolder}/_rels/${partUriXML}.rels`
+      : "_rels/.rels";
+
+    const relsFile = this.package.file(relsPath);
+    if (!relsFile) {
+      console.log("No relationships file found at the specified path.");
+      return []; // Return an empty array if no relationships file is found
+    }
+
+    // Read and parse the relationships XML
+    const xmlData = await relsFile.async("string");
+    const doc = parser.parseFromString(xmlData, "application/xml");
+    const relationshipElements = doc.getElementsByTagName("Relationship");
+
+    for (let i = 0; i < relationshipElements.length; i++) {
+      const rel = relationshipElements[i];
+      relationships.push({
+        id: rel.getAttribute("Id"),
+        type: rel.getAttribute("Type"),
+        target: rel.getAttribute("Target"),
+        targetMode: rel.getAttribute("TargetMode"),
+      });
+    }
+
+    return relationships;
   };
 }

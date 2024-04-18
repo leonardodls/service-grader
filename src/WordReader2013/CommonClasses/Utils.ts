@@ -1,7 +1,7 @@
 export class Utils {
-  static createNode = (
+  static CreateNode = (
     xmlDoc: XMLDocument,
-    xmlParent: Element,
+    xmlParent: XMLDocument | Element,
     tagName: string,
     tagValue: string
   ): Element => {
@@ -13,5 +13,17 @@ export class Utils {
     xmlEle.appendChild(xmlDoc.createTextNode(tagValue));
     xmlParent.appendChild(xmlEle);
     return xmlEle;
+  };
+
+  static CreateAttribute = (
+    xmlDoc: XMLDocument,
+    xmlParent: Element,
+    attrName: string,
+    attrValue: string
+  ) => {
+    const xmlAttr = xmlDoc.createAttribute(attrName);
+    xmlAttr.value = attrValue;
+    xmlParent.attributes.setNamedItem(xmlAttr);
+    return xmlAttr;
   };
 }

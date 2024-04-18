@@ -4,6 +4,9 @@ import { CommonFunctions } from "../Utils/common";
 import { IPartFileParser } from "../ReaderBase/IPartFileParser";
 import { DocPropertiesParser } from "./ElementParser/DocPropertiesParser";
 import { Office12WordTranslator } from "../WordReader/Office12WordTranslator";
+import { Utils } from "./CommonClasses/Utils";
+import xmldom from "xmldom";
+import { ParagraphParser2013 } from "./ElementClasses/ParagraphParser2013";
 
 export class Word2013Translator extends Office12WordTranslator {
   ParseDocument = async (
@@ -35,6 +38,31 @@ export class Word2013Translator extends Office12WordTranslator {
       checkForIncompatibleOfficePlatform
     );
 
+    const uriString: string = await this.m_myPackageReader.ReturnBaseXML(
+      null,
+      "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"
+    );
+
+    if (uriString == "") {
+      return false;
+    }
+    this.m_Uri = CommonFunctions.PrependStringToURIPath(uriString, "/");
+
+    const ss: Buffer | null = await this.m_myPackageReader.ReturnPackagePart(
+      this.m_Uri,
+      0
+    );
+
+    if (!ss) {
+      return false;
+    }
+
+    //Read the document.xml
+    const parser = new xmldom.DOMParser();
+    this.m_xmlDoc = parser.parseFromString(ss.toString(), "text/xml");
+
+    this.LoadXMLs();
+
     return true;
   };
 
@@ -50,21 +78,63 @@ export class Word2013Translator extends Office12WordTranslator {
       return null;
     }
 
-    // const uri = new URL(CommonFunctions.prependStringToURIPath(srtURI, "/")); need to understand better
-    const uri = CommonFunctions.prependStringToURIPath(srtURI, "/");
+    // const uri = new URL(CommonFunctions.PrependStringToURIPath(srtURI, "/")); need to understand better
+    const uri = CommonFunctions.PrependStringToURIPath(srtURI, "/");
 
     const ss: Buffer | null = await this.m_myPackageReader.ReturnPackagePart(
-      String(uri)
+      uri
     );
     const docProps: IPartFileParser = new DocPropertiesParser();
 
-    const eleDocProps: XMLDocument | HTMLElement = docProps.RetrunParsedElement(
+    const eleDocProps: XMLDocument | Element = docProps.RetrunParsedElement(
       ss as Buffer,
       this.m_xmlGeneDoc as XMLDocument
+    );
+
+    Utils.CreateNode(
+      this.m_xmlGeneDoc as XMLDocument,
+      eleDocProps,
+      "name",
+      this.m_DocumentName
     );
 
     const xReturn = this.ReturnCoreProperties(eleDocProps);
 
     return xReturn;
+  };
+
+  ReturnBodyChild = async (nChildNo: number) => {
+    if (!this.m_xmlBodyEle) {
+      throw new Error("Package is not parsed yet..");
+    }
+    const xmlChildEle = this.m_xmlBodyEle.childNodes.item(nChildNo) as Element;
+
+    switch (xmlChildEle.nodeName) {
+      case "w:p":
+        let xPara: Element;
+        try {
+          const paragraph: ParagraphParser2013 = new ParagraphParser2013();
+          xPara = await paragraph.ReturnParsedElement(
+            xmlChildEle,
+            this.m_xmlGeneDoc as XMLDocument,
+            this.m_myPackageReader as PackageReader
+          );
+        } catch (error) {
+          throw new Error(
+            "Something wen wrong in ReturnBodyChild method of word2013 translator!!"
+          );
+        }
+        Utils.CreateAttribute(
+          this.m_xmlGeneDoc as XMLDocument,
+          xPara,
+          "index",
+          (++this.m_nChildIndex).toString()
+        );
+
+        return xPara;
+
+      default:
+        return null;
+    }
   };
 }
