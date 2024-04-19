@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import xmldom from "xmldom";
+import xmldom from "@xmldom/xmldom";
 
 interface relationship {
   id: string | null;

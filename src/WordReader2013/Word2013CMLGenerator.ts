@@ -1,6 +1,6 @@
 import { ICMLGenerator } from "../ReaderBase/ICMLGenerator";
 import { ITranslator } from "../ReaderBase/ITranslator";
-import * as xmldom from "xmldom";
+import * as xmldom from "@xmldom/xmldom";
 import { IWordTranslator } from "../ReaderBase/IWordTranslator";
 import { Utils } from "./CommonClasses/Utils";
 

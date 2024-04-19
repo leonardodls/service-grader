@@ -5,7 +5,7 @@ import { IPartFileParser } from "../ReaderBase/IPartFileParser";
 import { DocPropertiesParser } from "./ElementParser/DocPropertiesParser";
 import { Office12WordTranslator } from "../WordReader/Office12WordTranslator";
 import { Utils } from "./CommonClasses/Utils";
-import xmldom from "xmldom";
+import xmldom from "@xmldom/xmldom";
 import { ParagraphParser2013 } from "./ElementClasses/ParagraphParser2013";
 
 export class Word2013Translator extends Office12WordTranslator {

@@ -6,7 +6,7 @@ import multer from "multer";
 import fs from "fs/promises";
 import { Word2013CMLGenerator } from "./WordReader2013/Word2013CMLGenerator";
 import { Word2013Translator } from "./WordReader2013/Word2013Translator";
-import xmldom from "xmldom";
+import xmldom from "@xmldom/xmldom";
 
 dotenv.config();
 

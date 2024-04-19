@@ -1,6 +1,6 @@
 import { IPartFileParser } from "../../ReaderBase/IPartFileParser";
 import { Utils } from "../CommonClasses/Utils";
-import xmldom from "xmldom";
+import xmldom from "@xmldom/xmldom";
 
 export class DocPropertiesParser implements IPartFileParser {
   RetrunParsedElement = (
