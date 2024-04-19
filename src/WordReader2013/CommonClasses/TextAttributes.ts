@@ -8,6 +8,7 @@ import { WordUtils2010 } from "../../WordReader2010/CommonClasses/WordUtils";
 export class TextAttributes2013 {
   public m_bParaInCell: boolean = false;
   private m_xmlParaEle: Element | null = null;
+  private nIndex: number = 0;
   private m_myXmlDoc: XMLDocument | null = null;
   private m_CMLProps: Element | null = null;
   private m_myPackageReader: PackageReader | null = null;
@@ -45,7 +46,6 @@ export class TextAttributes2013 {
 
   GenerateParaText = (XmlOffice12Node: Element, paraProps: Element) => {
     let strParaText: string = "",
-      nIndex: number = 0,
       nFormulaCount: number = 0,
       sFormula: string = "",
       sFldFlag: string = "",
@@ -352,8 +352,7 @@ export class TextAttributes2013 {
 
               const sText = this.ExtractParaTextAndSpecialcharsFromRNode(
                 objNode,
-                strParaText,
-                nIndex
+                strParaText
               );
 
               sBuffer += sText;
@@ -361,7 +360,7 @@ export class TextAttributes2013 {
                 `formulas/formula[@id='${nFormulaCount.toString()}']`,
                 paraProps
               );
-              console.log("paraProps: ", paraProps.textContent);
+              // console.log("paraProps: ", paraProps.textContent);
               // const xFrm = paraProps.getElementsByTagName(
               //   "formulas/formula[@id='" + nFormulaCount.toString() + "']"
               // )[0];
@@ -440,8 +439,7 @@ export class TextAttributes2013 {
           if (sFldFlag.length <= 0) {
             const sText = this.ExtractParaTextAndSpecialcharsFromRNode(
               objNode as Element,
-              strParaText,
-              nIndex
+              strParaText
             );
             strParaText += sText;
           }
@@ -462,8 +460,7 @@ export class TextAttributes2013 {
 
   protected ExtractParaTextAndSpecialcharsFromRNode = (
     XmlRNode: Element,
-    sParaTxt: string,
-    nIndex: number
+    sParaTxt: string
   ) => {
     let strParaText = "";
     const xSCs = WordUtils2010.ReturnNode(
@@ -497,7 +494,7 @@ export class TextAttributes2013 {
                   this.m_myXmlDoc as XMLDocument,
                   xSC,
                   "id",
-                  nIndex.toString()
+                  this.nIndex.toString()
                 );
                 Utils.CreateNode(
                   this.m_myXmlDoc as XMLDocument,
@@ -511,7 +508,7 @@ export class TextAttributes2013 {
                   "pos",
                   (sParaTxt.length + i).toString()
                 );
-                nIndex++;
+                this.nIndex++;
                 break;
 
               case 8230:
@@ -525,7 +522,7 @@ export class TextAttributes2013 {
                   this.m_myXmlDoc as XMLDocument,
                   xSC,
                   "id",
-                  nIndex.toString()
+                  this.nIndex.toString()
                 );
                 Utils.CreateNode(
                   this.m_myXmlDoc as XMLDocument,
@@ -539,7 +536,7 @@ export class TextAttributes2013 {
                   "pos",
                   (sParaTxt.length + i).toString()
                 );
-                nIndex++;
+                this.nIndex++;
                 break;
 
               case 8212:
@@ -553,7 +550,7 @@ export class TextAttributes2013 {
                   this.m_myXmlDoc as XMLDocument,
                   xSC,
                   "id",
-                  nIndex.toString()
+                  this.nIndex.toString()
                 );
                 Utils.CreateNode(
                   this.m_myXmlDoc as XMLDocument,
@@ -567,7 +564,7 @@ export class TextAttributes2013 {
                   "pos",
                   (sParaTxt.length + i).toString()
                 );
-                nIndex++;
+                this.nIndex++;
                 break;
 
               case 160:
@@ -581,7 +578,7 @@ export class TextAttributes2013 {
                   this.m_myXmlDoc as XMLDocument,
                   xSC,
                   "id",
-                  nIndex.toString()
+                  this.nIndex.toString()
                 );
                 Utils.CreateNode(
                   this.m_myXmlDoc as XMLDocument,
@@ -595,7 +592,7 @@ export class TextAttributes2013 {
                   "pos",
                   (sParaTxt.length + i).toString()
                 );
-                nIndex++;
+                this.nIndex++;
                 break;
 
               case 8195:
@@ -609,7 +606,7 @@ export class TextAttributes2013 {
                   this.m_myXmlDoc as XMLDocument,
                   xSC,
                   "id",
-                  nIndex.toString()
+                  this.nIndex.toString()
                 );
                 Utils.CreateNode(
                   this.m_myXmlDoc as XMLDocument,
@@ -623,7 +620,7 @@ export class TextAttributes2013 {
                   "pos",
                   (sParaTxt.length + i).toString()
                 );
-                nIndex++;
+                this.nIndex++;
                 break;
 
               default:
@@ -651,7 +648,7 @@ export class TextAttributes2013 {
             this.m_myXmlDoc as XMLDocument,
             xSC,
             "id",
-            nIndex.toString()
+            this.nIndex.toString()
           );
           Utils.CreateNode(
             this.m_myXmlDoc as XMLDocument,
@@ -665,7 +662,7 @@ export class TextAttributes2013 {
             "pos",
             sParaTxt.length.toString()
           );
-          nIndex++;
+          this.nIndex++;
           break;
 
         case "w:softHyphen":
@@ -681,7 +678,7 @@ export class TextAttributes2013 {
             this.m_myXmlDoc as XMLDocument,
             xSC,
             "id",
-            nIndex.toString()
+            this.nIndex.toString()
           );
           Utils.CreateNode(
             this.m_myXmlDoc as XMLDocument,
@@ -695,7 +692,7 @@ export class TextAttributes2013 {
             "pos",
             sParaTxt.length.toString()
           );
-          nIndex++;
+          this.nIndex++;
           break;
         case "w:sym":
           if ((objNode as Element).attributes != null) {
@@ -722,7 +719,7 @@ export class TextAttributes2013 {
                 this.m_myXmlDoc as XMLDocument,
                 xSC,
                 "id",
-                nIndex.toString()
+                this.nIndex.toString()
               );
               Utils.CreateNode(
                 this.m_myXmlDoc as XMLDocument,
@@ -748,7 +745,7 @@ export class TextAttributes2013 {
                 "pos",
                 sParaTxt.length.toString()
               );
-              nIndex++;
+              this.nIndex++;
             }
           }
           break;
