@@ -482,18 +482,10 @@ export class TextAttributes2013 {
           // Read run text
           const p = objNode.textContent;
 
-          // Check for special chars in the run text
-          const cs = p?.split("") as string[];
-          const b: Buffer = Buffer.from(p as string, "utf16le"); // byte[] b = Encoding.Unicode.GetBytes(cs);
+          if (!p) break;
 
-          const nLength = cs.length;
-          let c: string[] = Array(nLength).fill(""); //char[] c = new char[nLength];
-          let b1: number, b2: number, f: boolean;
-
-          const decodedString = b.toString("utf16le"); //Encoding.Unicode.GetDecoder().Convert(b, 0, b.length, c, 0, nLength, true, out b1, out b2, out f);
-
-          for (let i = 0; i < nLength; i++) {
-            switch (c[i].codePointAt(0)) {
+          for (let i = 0; i < p.length; i++) {
+            switch (p[i].codePointAt(0)) {
               case 8211:
                 xSC = Utils.CreateNode(
                   this.m_myXmlDoc as XMLDocument,
