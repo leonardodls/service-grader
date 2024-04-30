@@ -61,7 +61,7 @@ export class Word2013Translator extends Office12WordTranslator {
     const parser = new xmldom.DOMParser();
     this.m_xmlDoc = parser.parseFromString(ss.toString(), "text/xml");
 
-    this.LoadXMLs();
+    await this.LoadXMLs();
 
     return true;
   };
@@ -121,7 +121,7 @@ export class Word2013Translator extends Office12WordTranslator {
           );
         } catch (error) {
           throw new Error(
-            "Something wen wrong in ReturnBodyChild method of word2013 translator!!"
+            "Something went wrong in ReturnBodyChild method of word2013 translator!!"
           );
         }
         Utils.CreateAttribute(
