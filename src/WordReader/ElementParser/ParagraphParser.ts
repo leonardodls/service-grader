@@ -20,8 +20,6 @@ export class ParagraphParser implements IElementParser {
     this.m_myPackageReader = CurrentPackageReader;
     this.m_myXmlDoc = CMLDocumentXMLNode;
 
-    // Utils.InitailizeNamespace(ref m_nsmgr, m_myXmlDoc, "w", "http://schemas.openxmlformats.org/wordprocessingml/2006/main");
-
     const strDocUriString: string = await this.m_myPackageReader.ReturnBaseXML(
       null,
       "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"
@@ -42,7 +40,7 @@ export class ParagraphParser implements IElementParser {
 
     const txtAtt: TextAttributes2013 = new TextAttributes2013(); //TextAttributes2013 txtAtt = new TextAttributes2013();
     txtAtt.m_bParaInCell = false; //txtAtt.m_bParaInCell = this.m_bParaInCell;
-    txtAtt.ParseTextAttributes(
+    await txtAtt.ParseTextAttributes(
       XmlOffice12Node,
       this.m_myXmlDoc,
       pProps,
